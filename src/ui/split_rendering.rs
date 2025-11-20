@@ -24,13 +24,13 @@ fn push_span_with_map(
     map: &mut Vec<Option<usize>>,
     text: String,
     style: Style,
-    view_idx: Option<usize>,
+    source: Option<usize>,
 ) {
     if text.is_empty() {
         return;
     }
     for _ in text.chars() {
-        map.push(view_idx);
+        map.push(source);
     }
     spans.push(Span::styled(text, style));
 }
@@ -521,10 +521,6 @@ impl SplitRenderer {
             view_lines.push((0, String::new(), false));
         }
 
-        // Extra sources for synthesized view indices (e.g., end-of-line cursor indicators)
-        let mut view_extra_sources: HashMap<usize, Option<usize>> = HashMap::new();
-
-        // Build source->view map (first occurrence)
         // Viewport anchoring for transformed view: find view char closest to top_byte
         let view_top = view_mapping
             .iter()
@@ -833,6 +829,8 @@ impl SplitRenderer {
             // Check if this line has any selected text
             let mut char_index = 0;
             let mut col_offset = 0usize;
+            let mut last_seg_y: Option<u16> = None;
+            let mut last_seg_width: usize = 0;
 
             // Debug: Log first line rendering with cursor info
             if lines_rendered == 0 && !cursor_positions.is_empty() {
@@ -1127,7 +1125,7 @@ impl SplitRenderer {
                             &mut line_view_map,
                             display_char.to_string(),
                             style,
-                            Some(view_idx),
+                            byte_pos,
                         );
                     }
 
@@ -1174,14 +1172,14 @@ impl SplitRenderer {
                                     .fg(theme.editor_fg)
                                     .bg(theme.inactive_cursor)
                             };
-                        push_span_with_map(
-                            &mut line_spans,
-                            &mut line_view_map,
-                            " ".to_string(),
-                            cursor_style,
-                            Some(view_idx),
-                        );
-                    }
+                            push_span_with_map(
+                                &mut line_spans,
+                                &mut line_view_map,
+                                " ".to_string(),
+                                cursor_style,
+                                byte_pos,
+                            );
+                        }
                         // Primary cursor on newline will be shown by terminal hardware cursor (active split only)
                     }
                 }
@@ -1236,26 +1234,12 @@ impl SplitRenderer {
                                 .fg(theme.editor_fg)
                                 .bg(theme.inactive_cursor)
                         };
-                        let view_end_idx = line_view_offset + line_len_chars;
-                        // Attempt to derive source end byte from last mapped char
-                        if line_len_chars > 0 {
-                            let last_idx = view_end_idx.saturating_sub(1);
-                            if let Some(Some(src_last)) = view_mapping.get(last_idx) {
-                                if let Some(last_char) = line_content.chars().last() {
-                                    view_extra_sources.insert(
-                                        view_end_idx,
-                                        Some(src_last + last_char.len_utf8()),
-                                    );
-                                }
-                            }
-                        }
-
                         push_span_with_map(
                             &mut line_spans,
                             &mut line_view_map,
                             " ".to_string(),
                             cursor_style,
-                            Some(view_end_idx),
+                            None,
                         );
                     }
                     // Primary cursor at end of line will be shown by terminal hardware cursor (active split only)
@@ -1320,6 +1304,7 @@ impl SplitRenderer {
                     // (see the loop at line ~462 that skips chars before left_col)
                     // So we don't need to skip again here - just use the segment text as-is
                     let segment_text = segment.text.clone();
+                    last_seg_width = segment_text.chars().count();
 
                     // Apply styles to segment (preserving syntax highlighting, selection, overlays, etc.)
                     let styled_spans = Self::apply_styles_to_segment(
@@ -1332,6 +1317,7 @@ impl SplitRenderer {
 
                     // Record source->screen mapping for visible characters in this segment
                     let current_y = lines.len() as u16;
+                    last_seg_y = Some(current_y);
                     for (i, ch) in segment_text.chars().enumerate() {
                         if ch == '\n' {
                             continue;
@@ -1343,8 +1329,7 @@ impl SplitRenderer {
                             let src_opt = view_mapping
                                 .get(*view_idx)
                                 .copied()
-                                .flatten()
-                                .or_else(|| view_extra_sources.get(view_idx).copied().flatten());
+                                .flatten();
                             if let Some(src) = src_opt {
                                 // latest wins; monotonic render order preserves the last on-screen position
                                 source_to_screen.insert(src, (screen_x, current_y));
@@ -1377,6 +1362,25 @@ impl SplitRenderer {
             // Break early if we've filled the viewport during wrapping
             if lines_rendered >= visible_count {
                 break;
+            }
+
+            // Map newline/caret positions to end-of-line screen coord
+            if let Some(y) = last_seg_y {
+                let end_x = last_seg_width as u16;
+                let view_end_idx = line_view_offset + line_content.chars().count();
+
+                // Map newline byte to end-of-line position
+                if line_has_newline && line_content.chars().count() > 0 {
+                    let newline_idx = view_end_idx.saturating_sub(1);
+                    if let Some(Some(src_newline)) = view_mapping.get(newline_idx) {
+                        source_to_screen.insert(*src_newline, (end_x, y));
+                        if *src_newline == state.cursors.primary().position {
+                            cursor_screen_x = end_x;
+                            cursor_screen_y = y;
+                            have_cursor = true;
+                        }
+                    }
+                }
             }
         }
 
