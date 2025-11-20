@@ -1,0 +1,61 @@
+//! View stream representation for rendering
+//!
+//! This module defines a lightweight, source-anchored view stream that can be
+//! transformed (e.g., by plugins) before layout. It keeps mappings back to
+//! source offsets for hit-testing and cursor positioning.
+
+use crate::overlay::OverlayFace;
+use crate::virtual_text::VirtualTextPosition;
+use ratatui::style::Style;
+
+/// Kind of token in the view stream
+#[derive(Debug, Clone, PartialEq)]
+pub enum ViewTokenKind {
+    /// Plain text slice
+    Text(String),
+    /// Newline in the source
+    Newline,
+    /// Virtual text (injected, not in source)
+    VirtualText {
+        text: String,
+        style: Style,
+        position: VirtualTextPosition,
+        priority: i32,
+    },
+    /// Style span start/end (source-anchored)
+    StyleStart(Style),
+    StyleEnd,
+    /// Overlay span (for decorations)
+    Overlay(OverlayFace),
+}
+
+/// A view token with source mapping
+#[derive(Debug, Clone)]
+pub struct ViewToken {
+    /// Byte offset in source for this token, if any
+    pub source_offset: Option<usize>,
+    /// The token kind
+    pub kind: ViewTokenKind,
+}
+
+/// A view stream for a viewport
+#[derive(Debug, Clone)]
+pub struct ViewStream {
+    pub tokens: Vec<ViewToken>,
+    /// Mapping from view token index to source offset (if present)
+    pub source_map: Vec<Option<usize>>,
+}
+
+impl ViewStream {
+    pub fn new() -> Self {
+        Self {
+            tokens: Vec::new(),
+            source_map: Vec::new(),
+        }
+    }
+
+    pub fn push(&mut self, token: ViewToken) {
+        self.source_map.push(token.source_offset);
+        self.tokens.push(token);
+    }
+}

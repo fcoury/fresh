@@ -50,6 +50,7 @@ pub mod text_property;
 pub mod theme;
 pub mod ts_runtime;
 pub mod ui;
+pub mod view;
 pub mod viewport;
 pub mod virtual_text;
 pub mod word_navigation;
