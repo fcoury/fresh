@@ -5,14 +5,14 @@ expression: "&screen_text"
  File   Edit   View   Selection   Go   Help                                     
  [No Name]                                                                      
     1 │                                                                        █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │  Add Cursor Above          Ctrl+Alt+↑  Add a cursor on the line above        │
 │  Add Cursor Below          Ctrl+Alt+↓  Add a cursor on the line below        │

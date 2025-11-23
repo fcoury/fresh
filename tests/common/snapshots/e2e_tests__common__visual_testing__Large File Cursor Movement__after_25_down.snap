@@ -24,4 +24,4 @@ expression: "&screen_text"
         │ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx │
      30 │ @00002320:                                                           │
         │ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx │
-/tmp/fresh-test-BIG.txt | Ln 25, Col 0 | Opened /tmp/fresh-...  Palette: Ctrl+P
+/tmp/fresh-test-BIG.txt | Ln 25, Col 0 | Auto-revert disabl...  Palette: Ctrl+P

@@ -9,19 +9,19 @@ expression: "&screen_text"
 ●   3 │     let y = 10;                                                        █
     4 │     println!("Hello");                                                 █
     5 │ }                                                                      █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
+    6 │                                                                        █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
 [No Name] [+] | Ln 5, Col 0 | E:1 W:1                           Palette: Ctrl+P

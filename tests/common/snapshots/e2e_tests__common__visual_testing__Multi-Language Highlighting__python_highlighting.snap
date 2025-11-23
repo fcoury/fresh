@@ -12,22 +12,22 @@ expression: "&screen_text"
     6 │ if __name__ == "__main__":                                             █
     7 │     message = greet("World")                                           █
     8 │     print(message)                                                     █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
-                                                                               █
+    9 │                                                                        █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
+~                                                                              █
 hello.py | Ln 0, Col 0 | Opened hello.py                        Palette: Ctrl+P
